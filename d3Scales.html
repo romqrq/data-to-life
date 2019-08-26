@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>D3 and SVG</title>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+</head>
+
+<body>
+    <h1>Bar chart with D3</h1>
+
+    <div id="draw-here"></div>
+
+    <script>
+        var h = 500;
+        var w = 500;
+        var barPadding = 1;
+
+        var dataset = [450, 100, 100, 500, 600, 25, 350, 120, 80, 130,
+            110, 102, 375, 200, 175, 168, 180, 230, 205
+        ];
+
+        var scale = d3.scale.linear() //ir can be linear(numbers) or ordinal(strings)
+            .domain([0, 600]) // the boundary between the lowest and highest value in the data.domain([0, d3.max(dataset)]) can be used when we don't know the highest number
+            .range([0, 500]); // boundaries within our data will be fitted in, it keeps the proportion. .range([0, h]) 
+
+        var colWidth = w / dataset.length;
+        var barWidth = colWidth - barPadding;
+
+        //here we're setting up the svg to use the div as a viewport and setting width and height
+        var svg = d3.select("#draw-here") //.select ties our viewport to the div with the #draw-here id
+            .append("svg") //append the an SVG as a child of the div
+            .attr("height", h) //tells that height and width of this viewport is determined by
+            .attr("width", w); // the h and w variables
+        //from here on, we're setting up the bar chart
+        svg.selectAll("rect") //selects all rectangles created
+            .data(dataset) // tells where the data is coming from (var dataset)
+            .enter()
+            .append("rect") //from here determine how the rectangle will look like
+            .attr("x", function(d, i) { //starting point on X axle. d = datum and i = datum index
+                return i * (w / dataset.length);
+            })
+            .attr("y", function(d) { //strating point on Y axle
+                return h - scale(d);
+            })
+            .attr("height", function(d) { //the actual height on the datum
+                return scale(d);
+            })
+            .attr("width", barWidth);
+
+        //Making the data visualization richer, more informative.
+        svg.selectAll("text")
+            .data(dataset)
+            .enter()
+            .append("text")
+            .text(function(d) {
+                return d;
+            })
+            .attr("text-anchor", "middle")
+            .attr("x", function(d, i) {
+                return i * colWidth + barWidth / 2;
+            })
+            .attr("y", function(d) {
+                return h - scale(d) + 14;
+            })
+            .attr("font-family", "sans-serif")
+            .attr("font-size", "11px")
+            .attr("fill", "white")
+    </script>
+</body>
+
+</html>
